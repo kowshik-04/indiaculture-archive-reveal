@@ -362,10 +362,22 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
           throw new Error(`Unknown item type: ${type}`);
       }
 
+      let key: keyof CultureDatabase;
+      switch (type) {
+        case 'cloth':
+          key = 'clothes';
+          break;
+        case 'food':
+          key = 'food';
+          break;
+        default:
+          key = `${type}s` as keyof CultureDatabase;
+      }
+
       setDatabase(prev => ({
         ...prev,
-        [type === 'cloth' ? 'clothes' : `${type}s`]: [
-          ...prev[type === 'cloth' ? 'clothes' : `${type}s` as keyof CultureDatabase],
+        [key]: [
+          ...prev[key],
           newItem
         ]
       }));
@@ -378,8 +390,18 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const getItemsByType = (type: ItemType): CultureItem[] => {
-    const key = type === 'cloth' ? 'clothes' : `${type}s` as keyof CultureDatabase;
-    return database[key];
+    let key: keyof CultureDatabase;
+    switch (type) {
+      case 'cloth':
+        key = 'clothes';
+        break;
+      case 'food':
+        key = 'food';
+        break;
+      default:
+        key = `${type}s` as keyof CultureDatabase;
+    }
+    return database[key] || [];
   };
 
   const getItemById = (id: string): CultureItem | undefined => {
