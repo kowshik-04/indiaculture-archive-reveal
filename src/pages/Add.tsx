@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Upload, X } from "lucide-react";
+import { Plus, X } from "lucide-react";
+import FileUpload from "@/components/FileUpload";
 import type { ItemType, FormData } from "@/types/CultureData";
 
 const Add = () => {
@@ -24,6 +25,8 @@ const Add = () => {
     images: [],
     videos: []
   });
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [videoFiles, setVideoFiles] = useState<File[]>([]);
 
   const resetForm = () => {
     setFormData({
@@ -34,6 +37,8 @@ const Add = () => {
       videos: []
     });
     setSelectedType('');
+    setImageFiles([]);
+    setVideoFiles([]);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -57,26 +62,24 @@ const Add = () => {
       return;
     }
 
-    if (formData.images.length < 3) {
+    if (imageFiles.length < 1) {
       toast({
         title: "Error",
-        description: "Please upload at least 3 images",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (formData.videos.length < 1) {
-      toast({
-        title: "Error",
-        description: "Please upload at least 1 video",
+        description: "Please upload at least 1 image",
         variant: "destructive"
       });
       return;
     }
 
     try {
-      addItem(selectedType, formData);
+      // Create the form data with uploaded files
+      const finalFormData = {
+        ...formData,
+        images: imageFiles,
+        videos: videoFiles
+      };
+      
+      addItem(selectedType, finalFormData);
       toast({
         title: "Success!",
         description: `${formData.name} has been added successfully`,
@@ -274,24 +277,25 @@ const Add = () => {
                 </p>
               </div>
 
-              {/* File Upload Placeholders */}
+              {/* File Upload */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label>Images * (minimum 3)</Label>
-                  <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
-                    <Upload className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground">Image upload feature coming soon</p>
-                    <p className="text-sm text-muted-foreground mt-2">Currently using placeholder images</p>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label>Videos * (minimum 1)</Label>
-                  <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
-                    <Upload className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground">Video upload feature coming soon</p>
-                    <p className="text-sm text-muted-foreground mt-2">Currently using placeholder videos</p>
-                  </div>
-                </div>
+                <FileUpload
+                  accept="image/*"
+                  multiple={true}
+                  onFilesChange={setImageFiles}
+                  files={imageFiles}
+                  type="images"
+                  required={true}
+                  minFiles={1}
+                />
+                <FileUpload
+                  accept="video/*"
+                  multiple={true}
+                  onFilesChange={setVideoFiles}
+                  files={videoFiles}
+                  type="videos"
+                  required={false}
+                />
               </div>
 
               {/* Submit Button */}

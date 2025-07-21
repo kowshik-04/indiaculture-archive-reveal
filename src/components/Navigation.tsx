@@ -42,8 +42,7 @@ const Navigation: React.FC = () => {
     { path: '/festivals', label: t('nav.festivals'), icon: Calendar },
     { path: '/food', label: t('nav.food'), icon: UtensilsCrossed },
     { path: '/clothes', label: t('nav.clothes'), icon: Shirt },
-    { path: '/villages', label: t('nav.villages'), icon: MapPin },
-    { path: '/map', label: t('nav.map'), icon: Map }
+    { path: '/villages', label: t('nav.villages'), icon: MapPin }
   ];
 
   const isActive = (path: string) => location.pathname === path;

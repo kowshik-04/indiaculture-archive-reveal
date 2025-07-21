@@ -1,13 +1,28 @@
+import { useState } from "react";
 import { useData } from "@/contexts/DataContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Shirt, Camera } from "lucide-react";
+import ItemDetailModal from "@/components/ItemDetailModal";
+import type { CultureItem } from "@/types/CultureData";
 
 const Clothes = () => {
   const { getItemsByType } = useData();
   const { t } = useLanguage();
   const clothes = getItemsByType('cloth');
+  const [selectedItem, setSelectedItem] = useState<CultureItem | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleItemClick = (cloth: CultureItem) => {
+    setSelectedItem(cloth);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedItem(null);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-muted/5 pt-20">
@@ -23,7 +38,11 @@ const Clothes = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {clothes.map((cloth) => (
-            <Card key={cloth.id} className="group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 bg-card/80 backdrop-blur-sm border-muted/20">
+            <Card 
+              key={cloth.id} 
+              className="group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 bg-card/80 backdrop-blur-sm border-muted/20 cursor-pointer"
+              onClick={() => handleItemClick(cloth)}
+            >
               <CardHeader className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg h-48">
                   <img
@@ -62,10 +81,16 @@ const Clothes = () => {
 
         {clothes.length === 0 && (
           <div className="text-center py-16">
-            <p className="text-muted-foreground text-lg">No clothes added yet. Be the first to add one!</p>
+            <p className="text-muted-foreground text-lg">No traditional clothing added yet. Be the first to add one!</p>
           </div>
         )}
       </div>
+
+      <ItemDetailModal
+        item={selectedItem}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 };

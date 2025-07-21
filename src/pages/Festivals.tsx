@@ -1,13 +1,28 @@
+import { useState } from "react";
 import { useData } from "@/contexts/DataContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Calendar, Camera } from "lucide-react";
+import ItemDetailModal from "@/components/ItemDetailModal";
+import type { CultureItem } from "@/types/CultureData";
 
 const Festivals = () => {
   const { getItemsByType } = useData();
   const { t } = useLanguage();
   const festivals = getItemsByType('festival');
+  const [selectedItem, setSelectedItem] = useState<CultureItem | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleItemClick = (festival: CultureItem) => {
+    setSelectedItem(festival);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedItem(null);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-secondary/5 pt-20">
@@ -23,7 +38,11 @@ const Festivals = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {festivals.map((festival) => (
-            <Card key={festival.id} className="group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 bg-card/80 backdrop-blur-sm border-secondary/20">
+            <Card 
+              key={festival.id} 
+              className="group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 bg-card/80 backdrop-blur-sm border-secondary/20 cursor-pointer"
+              onClick={() => handleItemClick(festival)}
+            >
               <CardHeader className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg h-48">
                   <img
@@ -66,6 +85,12 @@ const Festivals = () => {
           </div>
         )}
       </div>
+
+      <ItemDetailModal
+        item={selectedItem}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 };

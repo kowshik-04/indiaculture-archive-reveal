@@ -1,13 +1,28 @@
+import { useState } from "react";
 import { useData } from "@/contexts/DataContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Calendar, Camera } from "lucide-react";
+import ItemDetailModal from "@/components/ItemDetailModal";
+import type { CultureItem } from "@/types/CultureData";
 
 const Temples = () => {
   const { getItemsByType } = useData();
   const { t } = useLanguage();
   const temples = getItemsByType('temple');
+  const [selectedItem, setSelectedItem] = useState<CultureItem | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleItemClick = (temple: CultureItem) => {
+    setSelectedItem(temple);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedItem(null);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5 pt-20">
@@ -23,7 +38,11 @@ const Temples = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {temples.map((temple) => (
-            <Card key={temple.id} className="group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 bg-card/80 backdrop-blur-sm border-primary/20">
+            <Card 
+              key={temple.id} 
+              className="group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 bg-card/80 backdrop-blur-sm border-primary/20 cursor-pointer"
+              onClick={() => handleItemClick(temple)}
+            >
               <CardHeader className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg h-48">
                   <img
@@ -66,6 +85,12 @@ const Temples = () => {
           </div>
         )}
       </div>
+
+      <ItemDetailModal
+        item={selectedItem}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 };
